@@ -11,7 +11,7 @@ const gravity = 0.5;
 let isCheckpointCollisionDetectionActive = true;
 // Variablen für den Score
 let fliesCollected = 0; // Anzahl eingesammelter Fliegen
-const totalFlies = 10;    // Gesamtzahl der Fliegen im Spiel
+const totalFlies = 20;    // Gesamtzahl der Fliegen im Spiel
 
 const proportionalSize = (size) => {
   return innerHeight < 500 ? Math.ceil((size / 500) * innerHeight) : size;
@@ -231,6 +231,7 @@ const platformPositions = [
   { x: 3900, y: proportionalSize(450) },
   { x: 4200, y: proportionalSize(400) },
   { x: 4400, y: proportionalSize(200) },
+  { x: 4550, y: proportionalSize(200) },
   { x: 4700, y: proportionalSize(150) },
 ];
 
@@ -240,7 +241,10 @@ const platforms = platformPositions.map(
 
 //Positionen der horizontalen Plattformen
 const blockadePositions = [
-  {x: 1210, y: proportionalSize(-10) },
+  { x: 1210, y: proportionalSize(-10) },
+  { x: 2860, y: proportionalSize(240) },
+  { x: 2860, y: proportionalSize(0) },
+  { x: 4860, y: proportionalSize(-10) },
 ];
 
 const blockade = blockadePositions.map(
@@ -250,16 +254,26 @@ const blockade = blockadePositions.map(
 
 // Position der Fliegen
 const flyPositions = [
-  { x: 300, y: proportionalSize(350) },
+  { x: 550, y: proportionalSize(350) },
   { x: 700, y: proportionalSize(250) },
   { x: 1100, y: proportionalSize(450) },
   { x: 1450, y: proportionalSize(350) },
   { x: 1800, y: proportionalSize(250) },
   { x: 2000, y: proportionalSize(450) },
   { x: 2300, y: proportionalSize(350) },
-  { x: 2600, y: proportionalSize(250) },
-  { x: 3000, y: proportionalSize(450) },
+  { x: 2500, y: proportionalSize(150) },
+  { x: 2875, y: proportionalSize(220) },
+  { x: 3000, y: proportionalSize(450) }, //10
+  { x: 3250, y: proportionalSize(250) }, 
   { x: 3400, y: proportionalSize(450) },
+  { x: 3600, y: proportionalSize(250) },
+  { x: 3780, y: proportionalSize(750) },
+  { x: 3900, y: proportionalSize(550) },
+  { x: 4050, y: proportionalSize(600) },
+  { x: 4300, y: proportionalSize(250) },
+  { x: 4500, y: proportionalSize(100) },
+  { x: 4700, y: proportionalSize(20) },
+  { x: 4800, y: proportionalSize(500) }, //20
 ];
 
 // Erstelle die Fliegen
@@ -317,48 +331,52 @@ function updateScoreBoard() {
 }
 
  // Bewegungserkennung -> Mapmovement
-  if (keys.rightKey.pressed && player.position.x < proportionalSize(400)) {
-    player.velocity.x = 5;
-  } else if (keys.leftKey.pressed && player.position.x > proportionalSize(100)) {
-    player.velocity.x = -5;
-  } else {
-    player.velocity.x = 0;
+if (keys.rightKey.pressed && player.position.x < proportionalSize(400)) {
+  player.velocity.x = 5;
+} else if (keys.leftKey.pressed && player.position.x > proportionalSize(100)) {
+  player.velocity.x = -5;
+} else {
+  player.velocity.x = 0;
 
-    if (keys.rightKey.pressed && isCheckpointCollisionDetectionActive) {
-      platforms.forEach((platform) => {
-        platform.position.x -= 5;
-      });
+  // Überprüfen, ob die Karte noch verschoben werden kann
+  if (keys.rightKey.pressed && isCheckpointCollisionDetectionActive && platforms[platforms.length - 1].position.x > canvas.width - proportionalSize(1250)) {
+    // Nur bewegen, wenn die Karte noch Platz hat
+    platforms.forEach((platform) => {
+      platform.position.x -= 5;
+    });
 
-      blockade.forEach((block) => {
-        block.position.x -= 5;
-      });
+    blockade.forEach((block) => {
+      block.position.x -= 5;
+    });
 
-      flies.forEach((fly) => {
-        fly.position.x -= 5;
-      });
+    flies.forEach((fly) => {
+      fly.position.x -= 5;
+    });
 
-      checkpoints.forEach((checkpoint) => {
-        checkpoint.position.x -= 5;
-      });
-    
-    } else if (keys.leftKey.pressed && isCheckpointCollisionDetectionActive) {
-      platforms.forEach((platform) => {
-        platform.position.x += 5;
-      });
+    checkpoints.forEach((checkpoint) => {
+      checkpoint.position.x -= 5;
+    });
 
-      blockade.forEach((block) => {
-        block.position.x += 5;
-      });
+  } else if (keys.leftKey.pressed && isCheckpointCollisionDetectionActive && platforms[0].position.x < proportionalSize(10)) {
+    // Nur bewegen, wenn die Karte nach links noch Platz hat
+    platforms.forEach((platform) => {
+      platform.position.x += 5;
+    });
 
-      flies.forEach((fly) => {
-        fly.position.x += 5;
-      });
+    blockade.forEach((block) => {
+      block.position.x += 5;
+    });
 
-      checkpoints.forEach((checkpoint) => {
-        checkpoint.position.x += 5;
-      });
-    } 
+    flies.forEach((fly) => {
+      fly.position.x += 5;
+    });
+
+    checkpoints.forEach((checkpoint) => {
+      checkpoint.position.x += 5;
+    });
   }
+}
+
  //Plattformkollisionsregeln
  platforms.forEach((platform) => {
   const collisionDetectionRules = [
